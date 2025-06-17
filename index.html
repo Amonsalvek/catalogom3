@@ -373,18 +373,17 @@
 
         async function loadCSVData() {
             try {
-                const accessUrl = 'https://script.google.com/macros/s/AKfycbzpaW4vFJ-vv_k3BfiSriZssmrwsmNmti747rKv5LXbz24c2sV7XRs6SC6fk9sTzle23g/exec?sheet=accesos';
-                const catalogUrl = 'https://script.google.com/macros/s/AKfycbzpaW4vFJ-vv_k3BfiSriZssmrwsmNmti747rKv5LXbz24c2sV7XRs6SC6fk9sTzle23g/exec?sheet=catalogo';
-
-                // Carga de accesos
+                const accessUrl = 'https://catalogo-backend.onrender.com/api/catalogo?sheet=accesos';
+                const catalogUrl = 'https://catalogo-backend.onrender.com/api/catalogo?sheet=catalogo';
+                
                 const accessResponse = await fetch(accessUrl);
                 const accessJson = await accessResponse.json();
-                accessEmails = accessJson.map(row => row.email); // ajusta si tu columna tiene otro nombre
-
-                // Carga de catálogo
+                accessEmails = accessJson.map(row => row.email); // ajusta según el nombre de la columna
+                
                 const catalogResponse = await fetch(catalogUrl);
                 const catalogJson = await catalogResponse.json();
                 catalogData = catalogJson;
+
 
                 populateFilters();
             } catch (error) {
