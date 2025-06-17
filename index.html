@@ -373,8 +373,9 @@
 
         async function loadCSVData() {
             try {
-                const accessUrl = 'https://catalogo-backend.onrender.com/api/catalogo?sheet=accesos';
-                const catalogUrl = 'https://catalogo-backend.onrender.com/api/catalogo?sheet=catalogo';
+                const accessUrl = 'https://catalogo-backend-be2h.onrender.com/api/catalogo?sheet=accesos';
+                const catalogUrl = 'https://catalogo-backend-be2h.onrender.com/api/catalogo?sheet=catalogo';
+
                 
                 const accessResponse = await fetch(accessUrl);
                 const accessJson = await accessResponse.json();
