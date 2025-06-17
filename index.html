@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo M3</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* Landing Page Styles */
+        .landing-container {
+            height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .background-slider {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+        }
+
+        .background-image.active {
+            opacity: 1;
+        }
+
+        .background-image:nth-child(1) {
+            background-image: url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+        }
+
+        .background-image:nth-child(2) {
+            background-image: url('https://www.cummins.cl/cms/wp-content/uploads/2024/07/cummins-home-min.jpg');
+        }
+
+        .background-image:nth-child(3) {
+            background-image: url('https://www.cummins.cl/cms/wp-content/uploads/2024/07/cummins-home-min.jpg');
+        }
+
+        .landing-overlay {
+            background: rgba(0, 0, 0, 0.5);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .landing-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .title {
+            color: white;
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        .input-container {
+            margin-bottom: 1rem;
+        }
+
+        .email-input {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .access-btn {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        .access-btn:enabled:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+        }
+
+        .access-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* Catalog Styles */
+        .catalog-container {
+            display: none;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 2rem 0;
+        }
+
+        .catalog-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .catalog-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .filters-container {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: end;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .filter-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        .results-container {
+            display: flex;
+            gap: 2rem;
+            align-items: flex-start;
+        }
+
+        .results-list {
+            flex: 1;
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .result-item {
+            padding: 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .result-item:hover {
+            border-color: #007bff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2);
+        }
+
+        .result-item.selected {
+            border-color: #007bff;
+            background: #f8f9ff;
+        }
+
+        .sku-code {
+            font-weight: bold;
+            color: #007bff;
+            font-size: 1.1rem;
+        }
+
+        .sku-description {
+            color: #6c757d;
+            margin-top: 0.5rem;
+        }
+
+        .image-container {
+            flex: 0 0 400px;
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .product-image {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .no-results {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            padding: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2.5rem;
+            }
+
+            .filter-row {
+                flex-direction: column;
+            }
+
+            .results-container {
+                flex-direction: column;
+            }
+
+            .image-container {
+                flex: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Landing Page -->
+    <div id="landingPage" class="landing-container">
+        <div class="background-slider">
+            <div class="background-image active"></div>
+            <div class="background-image"></div>
+            <div class="background-image"></div>
+        </div>
+        <div class="landing-overlay"></div>
+        <div class="landing-content">
+            <h1 class="title">Catálogo M3</h1>
+            <div class="input-container">
+                <input type="email" id="emailInput" class="email-input" placeholder="Ingresa tu correo electrónico">
+            </div>
+            <button id="accessBtn" class="access-btn" disabled>Ingresar</button>
+        </div>
+    </div>
+
+    <!-- Catalog Page -->
+    <div id="catalogPage" class="catalog-container">
+        <div class="container">
+            <div class="catalog-header">
+                <h1 class="catalog-title">Catálogo M3</h1>
+                <p class="text-muted">Selecciona los filtros para encontrar el componente que necesitas</p>
+            </div>
+
+            <div class="filters-container">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label class="filter-label">Marca Camión</label>
+                        <select id="marcaCamion" class="filter-select">
+                            <option value="">Seleccionar marca...</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Modelo Camión</label>
+                        <select id="modeloCamion" class="filter-select" disabled>
+                            <option value="">Seleccionar modelo...</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Modelo Motor</label>
+                        <select id="modeloMotor" class="filter-select" disabled>
+                            <option value="">Seleccionar motor...</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Descripción Componente</label>
+                        <select id="descripcionComponente" class="filter-select" disabled>
+                            <option value="">Seleccionar componente...</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="results-container">
+                <div class="results-list">
+                    <div id="noResults" class="no-results">
+                        Selecciona todos los filtros para ver los resultados
+                    </div>
+                    <div id="resultsList"></div>
+                </div>
+                <div id="imageContainer" class="image-container">
+                    <img id="productImage" class="product-image" alt="Imagen del producto">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variables
+        let accessEmails = [];
+        let catalogData = [];
+        let currentImageIndex = 0;
+
+        // Background slider
+        function initBackgroundSlider() {
+            const images = document.querySelectorAll('.background-image');
+            let currentIndex = 0;
+
+            setInterval(() => {
+                images[currentIndex].classList.remove('active');
+                currentIndex = (currentIndex + 1) % images.length;
+                images[currentIndex].classList.add('active');
+            }, 8000);
+        }
+
+        // Email validation
+        function validateEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        async function loadCSVData() {
+            try {
+                const accessUrl = 'https://script.google.com/macros/s/AKfycbzpaW4vFJ-vv_k3BfiSriZssmrwsmNmti747rKv5LXbz24c2sV7XRs6SC6fk9sTzle23g/exec?sheet=accesos';
+                const catalogUrl = 'https://script.google.com/macros/s/AKfycbzpaW4vFJ-vv_k3BfiSriZssmrwsmNmti747rKv5LXbz24c2sV7XRs6SC6fk9sTzle23g/exec?sheet=catalogo';
+
+                // Carga de accesos
+                const accessResponse = await fetch(accessUrl);
+                const accessJson = await accessResponse.json();
+                accessEmails = accessJson.map(row => row.email); // ajusta si tu columna tiene otro nombre
+
+                // Carga de catálogo
+                const catalogResponse = await fetch(catalogUrl);
+                const catalogJson = await catalogResponse.json();
+                catalogData = catalogJson;
+
+                populateFilters();
+            } catch (error) {
+                console.error('Error loading CSV data:', error);
+                alert('Error al cargar los datos. Por favor, verifica las URLs del catálogo y accesos.');
+            }
+        }
+
+        // Populate filter dropdowns
+        function populateFilters() {
+            const marcas = [...new Set(catalogData.map(item => item.marcaCamion))];
+            populateSelect('marcaCamion', marcas);
+        }
+
+        function populateSelect(selectId, options) {
+            const select = document.getElementById(selectId);
+            select.innerHTML = `<option value="">Seleccionar ${selectId.replace(/([A-Z])/g, ' $1').toLowerCase()}...</option>`;
+            
+            options.forEach(option => {
+                const optionElement = document.createElement('option');
+                optionElement.value = option;
+                optionElement.textContent = option;
+                select.appendChild(optionElement);
+            });
+        }
+
+        // Filter cascade logic
+        function setupFilterCascade() {
+            document.getElementById('marcaCamion').addEventListener('change', function() {
+                const selectedMarca = this.value;
+                const modelos = [...new Set(catalogData
+                    .filter(item => item.marcaCamion === selectedMarca)
+                    .map(item => item.modeloCamion))];
+                
+                populateSelect('modeloCamion', modelos);
+                document.getElementById('modeloCamion').disabled = !selectedMarca;
+                
+                resetDownstreamFilters(['modeloMotor', 'descripcionComponente']);
+            });
+
+            document.getElementById('modeloCamion').addEventListener('change', function() {
+                const selectedMarca = document.getElementById('marcaCamion').value;
+                const selectedModelo = this.value;
+                const motores = [...new Set(catalogData
+                    .filter(item => item.marcaCamion === selectedMarca && item.modeloCamion === selectedModelo)
+                    .map(item => item.modeloMotor))];
+                
+                populateSelect('modeloMotor', motores);
+                document.getElementById('modeloMotor').disabled = !selectedModelo;
+                
+                resetDownstreamFilters(['descripcionComponente']);
+            });
+
+            document.getElementById('modeloMotor').addEventListener('change', function() {
+                const selectedMarca = document.getElementById('marcaCamion').value;
+                const selectedModelo = document.getElementById('modeloCamion').value;
+                const selectedMotor = this.value;
+                const componentes = [...new Set(catalogData
+                    .filter(item => 
+                        item.marcaCamion === selectedMarca && 
+                        item.modeloCamion === selectedModelo && 
+                        item.modeloMotor === selectedMotor
+                    )
+                    .map(item => item.descripcionComponente))];
+                
+                populateSelect('descripcionComponente', componentes);
+                document.getElementById('descripcionComponente').disabled = !selectedMotor;
+            });
+
+            document.getElementById('descripcionComponente').addEventListener('change', function() {
+                if (this.value) {
+                    showResults();
+                } else {
+                    hideResults();
+                }
+            });
+        }
+
+        function resetDownstreamFilters(filters) {
+            filters.forEach(filterId => {
+                const select = document.getElementById(filterId);
+                select.innerHTML = `<option value="">Seleccionar ${filterId.replace(/([A-Z])/g, ' $1').toLowerCase()}...</option>`;
+                select.disabled = true;
+            });
+            hideResults();
+        }
+
+        // Show filtered results
+        function showResults() {
+            const marca = document.getElementById('marcaCamion').value;
+            const modelo = document.getElementById('modeloCamion').value;
+            const motor = document.getElementById('modeloMotor').value;
+            const componente = document.getElementById('descripcionComponente').value;
+
+            const filteredData = catalogData.filter(item =>
+                item.marcaCamion === marca &&
+                item.modeloCamion === modelo &&
+                item.modeloMotor === motor &&
+                item.descripcionComponente === componente
+            );
+
+            const resultsList = document.getElementById('resultsList');
+            const noResults = document.getElementById('noResults');
+
+            if (filteredData.length > 0) {
+                noResults.style.display = 'none';
+                resultsList.innerHTML = '';
+
+                filteredData.forEach((item, index) => {
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'result-item';
+                    resultItem.innerHTML = `
+                        <div class="sku-code">${item.SKU}</div>
+                        <div class="sku-description">${item.descripcionSKU}</div>
+                    `;
+                    
+                    resultItem.addEventListener('click', () => {
+                        document.querySelectorAll('.result-item').forEach(el => el.classList.remove('selected'));
+                        resultItem.classList.add('selected');
+                        showImage(item.urlImagen);
+                    });
+
+                    resultsList.appendChild(resultItem);
+                });
+            } else {
+                noResults.style.display = 'block';
+                noResults.textContent = 'No se encontraron resultados para los filtros seleccionados';
+                resultsList.innerHTML = '';
+                hideImage();
+            }
+        }
+
+        function hideResults() {
+            document.getElementById('noResults').style.display = 'block';
+            document.getElementById('noResults').textContent = 'Selecciona todos los filtros para ver los resultados';
+            document.getElementById('resultsList').innerHTML = '';
+            hideImage();
+        }
+
+        function showImage(imageUrl) {
+            const imageContainer = document.getElementById('imageContainer');
+            const productImage = document.getElementById('productImage');
+            
+            productImage.src = imageUrl;
+            imageContainer.style.display = 'block';
+        }
+
+        function hideImage() {
+            document.getElementById('imageContainer').style.display = 'none';
+        }
+
+        // Authentication
+        function checkAccess(email) {
+            return accessEmails.includes(email);
+        }
+
+        function showCatalog() {
+            document.getElementById('landingPage').style.display = 'none';
+            document.getElementById('catalogPage').style.display = 'block';
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            initBackgroundSlider();
+            loadCSVData();
+
+            const emailInput = document.getElementById('emailInput');
+            const accessBtn = document.getElementById('accessBtn');
+
+            emailInput.addEventListener('input', function() {
+                const email = this.value.trim();
+                const isValid = validateEmail(email);
+                accessBtn.disabled = !isValid;
+            });
+
+            emailInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !accessBtn.disabled) {
+                    accessBtn.click();
+                }
+            });
+
+            accessBtn.addEventListener('click', function() {
+                const email = emailInput.value.trim();
+                
+                if (checkAccess(email)) {
+                    showCatalog();
+                    setupFilterCascade();
+                } else {
+                    alert('El correo electrónico no tiene acceso al catálogo.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
